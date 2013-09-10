@@ -20,7 +20,7 @@
 
   <h2>How to use it</h2>
   <h3>Desktop browsers</h3>
-    Drag the link, <a href="javascript:void((function() {
+    Drag the link, <a id="bookmarklet_link" href="javascript:void((function() {
   if (!document.getElementById('l10nb9t')) {
     var e=document.createElement('script');
     e.setAttribute('id', 'l10nb9t');
@@ -33,8 +33,9 @@
   <h3>iOS mobile safari</h3>
   <ol>
     <li>Bookmark this page.</li>
-    <li>Copy the bookmarklet link by long press.</li>
-    <li>Edit the bookmark to alter the address with copied bookmarklet.</li>
+    <li>Copy the bookmarklet code: <input id="bookmarklet_input" type="text">
+    </li>
+    <li>Edit the bookmark to alter the address with the bookmarklet code.</li>
   </ol>
 
 
@@ -50,5 +51,11 @@
   <ul>
     <li><a href="https://github.com/hiroshi/l10nb9t">The github repo.</a></li>
   </ul>
+
+  <script type="text/javascript">
+    (function() {
+      document.getElementById("bookmarklet_input").value = document.getElementById("bookmarklet_link").href;
+    })();
+  </script>
 </body>
 </html>
