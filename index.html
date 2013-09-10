@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>l10nb9t - The localization bookmarklet</title>
+</head>
+<body>
+  <h1>l10nb9t - The localization bookmarklet</h1>
+  <h2>What?</h2>
+
+  <p>
+    Just click the "Drag this link to the bookmark bar" link below. You may see date time description on anohter time zones are converted to your local timezone (depend on your system settings).
+    <ul>
+      <li>Sep 4, 2013 18:00 UTC</li>
+    </ul>
+  </p>
+
+  <h2>How to use it</h2>
+  <h3>Desktop browsers</h3>
+    Drag the link, <a href="javascript:void((function() {
+  if (!document.getElementById('l10nb9t')) {
+    var e=document.createElement('script');
+    e.setAttribute('id', 'l10nb9t');
+    e.setAttribute('type','text/javascript');
+    e.setAttribute('src','http://hiroshi.github.io/l10nb9t/l10nb9t.js');
+    document.body.appendChild(e)
+  }
+})())
+">l10nb9t</a>, to the bookmark bar.
+  <h3>iOS mobile safari</h3>
+  <ol>
+    <li>Bookmark this page.</li>
+    <li>Copy the bookmarklet link by long press.</li>
+    <li>Edit the bookmark to alter the address with copied bookmarklet.</li>
+  </ol>
+
+
+  <h2>Known issues</h2>
+  <ul>
+    <li>Supported date time formats are restricted with the regexp in the script and your broswer's implementation of Date.parse() javscript function.</li>
+    <li>We will add more date time formats.</li>
+    <li>Convert units like "10 miles (16 km)"</li>
+  </ul>
+
+  <h2>Other notes</h2>
+  <ul>
+    <li><a href="https://github.com/hiroshi/l10nb9t">The github repo.</a></li>
+  </ul>
+</body>
+</html>
