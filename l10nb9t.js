@@ -1,15 +1,24 @@
+// https://github.com/hiroshi/l10nb9t
 (function () {
+  var version = "0.0.1";
   // var time_zones = {
   //   "PT":  -8,
   //   "JST": +9,
   // };
+  var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var search_time = function(node) {
     var text = node.data, match = null;
+    // e.g. Sep 5, 2013 03:00 PST
     match = text.match(/\w+\s+\d{1,2},\s+\d{4}\s+\d{2}:\d{2}\s+\w+/)
     if (match) {
-      console.debug(match);
-      date = new Date(match[0])
-      node.data = text.replace(match[0], match[0] + " (" + date + ")");
+      d = new Date(match[0])
+      var m = d.toString().match(/\w+ (\w+ \d{1,2}) (\d{4}) (\d{2}:\d{2}):\d{2} GMT\+\d{4} \((\w+)\)/),
+          month_date = m[1],
+          year = m[2],
+          time = m[3],
+          timezone = m[4];
+      var localString = month_date + ", " + year + " " + time + " " + timezone;
+      node.data = text.replace(match[0], match[0] + " (" + localString + ")");
     }
     //match = node.data.match(/(\d{1,2})\s+(AM|PM)\s+(\w+)/i);
   };
