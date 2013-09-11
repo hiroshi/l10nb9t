@@ -6,26 +6,36 @@
   //   "JST": +9,
   // },
   // months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  patterns: [
+    {
+      pattern: /\w+\s+\d{1,2},\s+\d{4}\s+\d{2}:\d{2}\s+\w+/,
+      result: function(match) {
+        var d = new Date(match[0]),
+            m = d.toString().match(/\w+ (\w+ \d{1,2}) (\d{4}) (\d{2}:\d{2}):\d{2} GMT\+\d{4} \((\w+)\)/),
+            month_date = m[1],
+            year = m[2],
+            time = m[3],
+            timezone = m[4];
+        return month_date + ", " + year + " " + time + " " + timezone;
+      }
+    },
+    {
+      pattern: /(\d+)\s*miles?/i,
+      result: function(match) {
+        return (match[1] * 1.60935).toFixed(0) + " km";
+      }
+    }
+  ],
   search: function(node) {
-    var text = node.data, match = null;
-    // e.g. "Sep 5, 2013 03:00 PST"
-    match = text.match(/\w+\s+\d{1,2},\s+\d{4}\s+\d{2}:\d{2}\s+\w+/);
-    if (match) {
-      d = new Date(match[0])
-      var m = d.toString().match(/\w+ (\w+ \d{1,2}) (\d{4}) (\d{2}:\d{2}):\d{2} GMT\+\d{4} \((\w+)\)/),
-        month_date = m[1],
-        year = m[2],
-        time = m[3],
-        timezone = m[4];
-      var localString = month_date + ", " + year + " " + time + " " + timezone;
-      node.data = text.replace(match[0], match[0] + " (" + localString + ")");
+    var text = node.data, len = this.patterns.length, i, m, p;
+    for (i = 0; i < len; i++) {
+      p = this.patterns[i];
+      m = text.match(p.pattern);
+      if (m) {
+        node.data = text.replace(m[0], m[0] + " (" + p.result(m) + ")");
+        break;
+      }
     }
-    // e.g. "750 miles"
-    match = text.match(/(\d+)\s*miles?/i)
-    if (match) {
-      node.data = text.replace(match[0], match[0] + " (" + (match[1] * 1.60935).toFixed(0) + " km)");
-    }
-    //match = node.data.match(/(\d{1,2})\s+(AM|PM)\s+(\w+)/i);
   },
   traverse_node: function (node) {
     //console.debug(node);
