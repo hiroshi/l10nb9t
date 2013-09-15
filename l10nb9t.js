@@ -46,13 +46,13 @@
     return month_date + ", " + year + " " + time + " " + timezone;
   },
   patterns: [
-    { // e.g. Sep 10, 2013 10:00 PDT -> Sep 11, 2013 02:00 JST
-      pattern: /(\w+\s+\d{1,2},\s+\d{4}\s+\d{2}:\d{2})\s+(\w+)/,
+    { // e.g. "Sep 10, 2013 10:00 PDT"
+      pattern: /(\w+\s+\d{1,2},\s+\d{4}\s+[\d:]+(?:\s+[AP]M)?)\s+(\w+(?:[-+]\d)?)/i,
       result: function(m) {
         return this.dateString(new Date(m[1] + " " + this.normalizeTimeZone(m[2])));
       }
     },
-    { // e.g. Sep 11, 2013, 4PM - 6PM US/Pacific
+    { // e.g. "Sep 11, 2013, 4PM - 6PM US/Pacific"
       pattern: /(\w+\s+\d{1,2},\s+\d{4}),\s+(\d{1,2}\s*[AP]M|\d{1,2}:\d{2})\s*-\s*(\d{1,2}[AP]M|\d{1,2}:\d{2})\s+([\w\/]+)/i,
       result: function(m) {
         var from = new Date(m[1] + " " + this.normalizeTime(m[2]) + " " + this.normalizeTimeZone(m[4], m[1]))
