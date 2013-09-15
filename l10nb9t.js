@@ -35,7 +35,7 @@
     return str;
   },
   normalizeTime: function(str) {
-    var m = str.match(/(\d{1,2})\s*([AP]M)/i);
+    var m = str.match(/^(\d{1,2})\s*([AP]M)$/i);
     if (m) {
       return m[1] + ":00 " + m[2];
     }
@@ -51,22 +51,15 @@
   },
   r: {
     "date": /(\w+\s+\d{1,2}\s*,?\s*\d{4})/,
-    "time": /(\d{1,2}\s*[AP]M|\d{1,2}:\d{2})/,
+    "time": /([\d:]+(?:\s+[AP]M)?)/,
     "tz": /([\w\/]+(?:[-+]\d)?)/
   },
   patterns: [
     { // e.g. "Sep 10, 2013 10:00 PDT"
-      pattern: /(\w+\s+\d{1,2},\s+\d{4}\s+[\d:]+(?:\s+[AP]M)?)\s+(\w+(?:[-+]\d)?)/i,
-      result: function(m) {
-        return this.dateString(new Date(m[1] + " " + this.normalizeTimeZone(m[2])));
-      }
+      pattern: ["date", /\s+/, "time", /\s+/, "tz"]
     },
     { // e.g. "4 pm US/Pacific on Sep 11 2013"
       pattern: ["time", /\s+/, "tz", /\s+(?:on)?\s+/, "date"],
-      result: function(m) {
-        var str = m[3] + " " + this.normalizeTime(m[1]) + " " + this.normalizeTimeZone(m[2]);
-        return this.dateString(new Date(str))
-      }
     },
     { // e.g. "Sep 11, 2013, 4PM - 6PM US/Pacific"
       pattern: /(\w+\s+\d{1,2},\s+\d{4}),\s+(\d{1,2}\s*[AP]M|\d{1,2}:\d{2})\s*-\s*(\d{1,2}[AP]M|\d{1,2}:\d{2})\s+([\w\/]+)/i,
@@ -86,23 +79,29 @@
   search: function(node) {
     var text = node.data;
     this.each(this.patterns, function(p) {
-      var m;
+      var m, result;
       if (p.pattern.constructor == RegExp) {
         m = text.match(p.pattern);
       } else if (p.pattern.constructor == Array)  {
-        var r = "";
+        var i = 1, h = {}, r = "";
         this.each(p.pattern, function(pp) {
           if (typeof(pp) == "string") {
             r += this.r[pp].source
+            h[pp] = i++;
           } else {
             r += pp.source
           }
         });
         m = text.match(new RegExp(r, "i"));
+        if (m && !p.result) {
+          console.log(m[h["date"]] + " " + this.normalizeTime(m[h["time"]]) + " " + this.normalizeTimeZone(m[h["tz"]]))
+          result = this.dateString(new Date(m[h["date"]] + " " + this.normalizeTime(m[h["time"]]) + " " + this.normalizeTimeZone(m[h["tz"]])));
+        }
       }
       if (m) {
+        result = result || p.result.call(this, m);
         try {
-          node.data = text.replace(m[0], m[0] + " (" + p.result.call(this, m) + ")");
+          node.data = text.replace(m[0], m[0] + " (" + result + ")");
         } catch (e) {
           console.log(e);
         }
