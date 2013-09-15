@@ -37,7 +37,6 @@
     return str;
   },
   dateString: function(date) {
-    //console.log(date)
     var m = date.toString().match(/\w+ (\w+ \d{1,2}) (\d{4}) (\d{2}:\d{2}):\d{2} GMT\+\d{4} \((\w+)\)/),
       month_date = m[1],
       year = m[2],
@@ -45,11 +44,24 @@
       timezone = m[4];
     return month_date + ", " + year + " " + time + " " + timezone;
   },
+  r: {
+    "date": /(\w+\s+\d{1,2}\s*,?\s*\d{4})/,
+    "time": /(\d{1,2}\s*[AP]M|\d{1,2}:\d{2})/,
+    "tz": /([\w\/]+(?:[-+]\d)?)/
+  },
   patterns: [
     { // e.g. "Sep 10, 2013 10:00 PDT"
       pattern: /(\w+\s+\d{1,2},\s+\d{4}\s+[\d:]+(?:\s+[AP]M)?)\s+(\w+(?:[-+]\d)?)/i,
       result: function(m) {
         return this.dateString(new Date(m[1] + " " + this.normalizeTimeZone(m[2])));
+      }
+    },
+    {// e.g. "4 pm US/Pacific on Sep 11 2013"
+      pattern: ["time", /\s+/, "tz", /\s+(?:on)?\s+/, "date"],
+      result: function(m) {
+        var str = m[3] + " " + this.normalizeTime(m[1]) + " " + this.normalizeTimeZone(m[2]);
+        console.log(str)
+        return this.dateString(new Date(str))
       }
     },
     { // e.g. "Sep 11, 2013, 4PM - 6PM US/Pacific"
@@ -71,7 +83,19 @@
     var text = node.data, len = this.patterns.length, i, m, p;
     for (i = 0; i < len; i++) {
       p = this.patterns[i];
-      m = text.match(p.pattern);
+      if (p.pattern.constructor == RegExp) {
+        m = text.match(p.pattern);
+      } else if (p.pattern.constructor == Array)  {
+        var j, r = "";
+        for (j = 0; j < p.pattern.length; j++) {
+          if (typeof(p.pattern[j]) == "string") {
+            r += this.r[p.pattern[j]].source
+          } else {
+            r += p.pattern[j].source
+          }
+        }
+        m = text.match(new RegExp(r, "i"));
+      }
       if (m) {
         try {
           node.data = text.replace(m[0], m[0] + " (" + p.result.call(this, m) + ")");
