@@ -1,10 +1,15 @@
 // https://github.com/hiroshi/l10nb9t
+(function() {
 ({
-  version: "0.0.1",
-  // time_zones : {
-  //   "PT":  -8,
-  //   "JST": +9,
-  // },
+  // common
+  each: function(array, callback) {
+    var i, len = array.length;
+    for (i = 0; i < len; i++) {
+      if (callback.call(this, array[i], i) === false) {
+        break;
+      }
+    }
+  },
   // months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
   getDateOfNthDay: function(year, month, day, n) {
     var first_day = new Date(year, month, 1).getDay(),
@@ -56,11 +61,10 @@
         return this.dateString(new Date(m[1] + " " + this.normalizeTimeZone(m[2])));
       }
     },
-    {// e.g. "4 pm US/Pacific on Sep 11 2013"
+    { // e.g. "4 pm US/Pacific on Sep 11 2013"
       pattern: ["time", /\s+/, "tz", /\s+(?:on)?\s+/, "date"],
       result: function(m) {
         var str = m[3] + " " + this.normalizeTime(m[1]) + " " + this.normalizeTimeZone(m[2]);
-        console.log(str)
         return this.dateString(new Date(str))
       }
     },
@@ -80,20 +84,20 @@
     }
   ],
   search: function(node) {
-    var text = node.data, len = this.patterns.length, i, m, p;
-    for (i = 0; i < len; i++) {
-      p = this.patterns[i];
+    var text = node.data;
+    this.each(this.patterns, function(p) {
+      var m;
       if (p.pattern.constructor == RegExp) {
         m = text.match(p.pattern);
       } else if (p.pattern.constructor == Array)  {
-        var j, r = "";
-        for (j = 0; j < p.pattern.length; j++) {
-          if (typeof(p.pattern[j]) == "string") {
-            r += this.r[p.pattern[j]].source
+        var r = "";
+        this.each(p.pattern, function(pp) {
+          if (typeof(pp) == "string") {
+            r += this.r[pp].source
           } else {
-            r += p.pattern[j].source
+            r += pp.source
           }
-        }
+        });
         m = text.match(new RegExp(r, "i"));
       }
       if (m) {
@@ -102,9 +106,9 @@
         } catch (e) {
           console.log(e);
         }
-        break;
+        return false;
       }
-    }
+    });
   },
   traverseNode: function (node) {
     //console.debug(node);
@@ -138,10 +142,10 @@
     }
   },
   traverseNodes: function(nodes) {
-    var i, len = nodes.length
-    for (i = 0; i < len; i++) {
-      this.traverseNode(nodes[i]);
-    }
+    this.each(nodes, function(node) {
+      this.traverseNode(node);
+    });
   }
 }).traverseNodes(document.getElementsByTagName("body"));
+})();
 
