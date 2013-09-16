@@ -1,14 +1,12 @@
 // https://github.com/hiroshi/l10nb9t
 (function() {
-var Unit = {
-  pattern: function(regexp) {
-    return new RegExp(/([\d,]+)\s*/.source + regexp.source);
-  },
-  result: function(factor, unit) {
-    return function(match) {
-      return (match[1] * factor).toFixed(1) + " " + unit;
-    };
-  }
+var Unit = function(regexp, factor, unit) {
+  return {
+    pattern: new RegExp(/(\d+[\d,.]*)\s*/.source + regexp.source + /\b/.source),
+    result: function(match) {
+      return "~" + (match[1] * factor).toFixed(1) + " " + unit;
+    }
+  };
 };
 
 ({
@@ -80,14 +78,10 @@ var Unit = {
         return this.dateString(from) + " - " + this.dateString(to);
       }
     },
-    { // e.g. "10 miles" -> "16 km"
-      pattern: Unit.pattern(/(miles?|mi|ml)/i),
-      result: Unit.result(1.60935, "km"),
-    },
-    { // e.g. "750 sq ft" -> "69.6 m2"
-      pattern: Unit.pattern(/(?:sq|square)\s+(?:ft|feet)/i),
-      result: Unit.result(0.09290304, "m2"),
-    }
+    Unit(/(?:miles?|mi|ml)/i, 1.60935, "km"),
+    Unit(/(?:sq|square)\s+(?:ft|feet)/i, 0.09290304, "m2"),
+    Unit(/(?:'|feet|ft)/i, 0.3048, "m"),
+    Unit(/(?:\"|inch|in)/i, 2.54, "cm"),
   ],
   search: function(node) {
     var text = node.data;
