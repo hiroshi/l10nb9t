@@ -4,7 +4,7 @@ var Unit = function(regexp, factor, unit) {
   return {
     pattern: new RegExp(/(\d+[\d,.]*)\s*/.source + regexp.source + /\b/.source),
     result: function(match) {
-      return "~" + (match[1] * factor).toFixed(1) + " " + unit;
+      return "~" + (match[1] * factor).toFixed(2) + " " + unit;
     }
   };
 };
@@ -80,8 +80,13 @@ var Unit = function(regexp, factor, unit) {
     },
     Unit(/(?:miles?|mi|ml)/i, 1.60935, "km"),
     Unit(/(?:sq|square)\s+(?:ft|feet)/i, 0.09290304, "m2"),
-    Unit(/(?:'|feet|ft)/i, 0.3048, "m"),
-    Unit(/(?:\"|inch|in)/i, 2.54, "cm"),
+    Unit(/(?:'|foot|feet|ft)/i, 0.3048, "m"),
+    Unit(/(?:\"|inch|inches|in)/i, 2.54, "cm"),
+    Unit(/(?:yards?|yd)/i, 0.9144, "m"),
+    Unit(/(?:pounds?|lb)/i, 0.454, "kg"),
+    Unit(/(?:ounces?|oz)/i, 28.35, "g"),
+    Unit(/(?:gallons?|gal)/i, 4.54609, "L"),
+    Unit(/(?:pints?|pt)/i , 0.56826125 , "L")
   ],
   search: function(node) {
     var text = node.data;
@@ -153,4 +158,3 @@ var Unit = function(regexp, factor, unit) {
   }
 }).traverseNodes(document.getElementsByTagName("body"));
 })();
-
