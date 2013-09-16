@@ -1,5 +1,16 @@
 // https://github.com/hiroshi/l10nb9t
 (function() {
+var Unit = {
+  pattern: function(regexp) {
+    return new RegExp(/([\d,]+)\s*/.source + regexp.source);
+  },
+  result: function(factor, unit) {
+    return function(match) {
+      return (match[1] * factor).toFixed(1) + " " + unit;
+    };
+  }
+};
+
 ({
   // common
   each: function(array, callback) {
@@ -69,11 +80,13 @@
         return this.dateString(from) + " - " + this.dateString(to);
       }
     },
-    { // e.g. 10 miles -> 16 km
-      pattern: /(\d+)\s*miles?/i,
-      result: function(match) {
-        return (match[1] * 1.60935).toFixed(0) + " km";
-      }
+    { // e.g. "10 miles" -> "16 km"
+      pattern: Unit.pattern(/(miles?|mi|ml)/i),
+      result: Unit.result(1.60935, "km"),
+    },
+    { // e.g. "750 sq ft" -> "69.6 m2"
+      pattern: Unit.pattern(/(?:sq|square)\s+(?:ft|feet)/i),
+      result: Unit.result(0.09290304, "m2"),
     }
   ],
   search: function(node) {
@@ -94,17 +107,16 @@
         });
         m = text.match(new RegExp(r, "i"));
         if (m && !p.result) {
-          console.log(m[h["date"]] + " " + this.normalizeTime(m[h["time"]]) + " " + this.normalizeTimeZone(m[h["tz"]]))
           result = this.dateString(new Date(m[h["date"]] + " " + this.normalizeTime(m[h["time"]]) + " " + this.normalizeTimeZone(m[h["tz"]])));
         }
       }
       if (m) {
-        result = result || p.result.call(this, m);
         try {
-          node.data = text.replace(m[0], m[0] + " (" + result + ")");
+          result = result || p.result.call(this, m);
         } catch (e) {
           console.log(e);
         }
+        node.data = text.replace(m[0], m[0] + " (" + result + ")");
         return false;
       }
     });
