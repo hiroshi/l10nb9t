@@ -14,8 +14,17 @@
     return {
       pattern: new RegExp(/(?:^|\s+)(\d+[\d,.]*)\s*/.source + regexp.source + /\b/.source),
       result: function(match) {
-        var val = match[1].replace(",", "")
-        return "~" + (val * factor).toFixed(2) + " " + unit;
+        var val = match[1].replace(",", "") * factor,
+            frac = String(val).split(".")[1],
+            precision = 0, about = "";
+        if (frac) {
+          precision = frac.length;
+          if (frac.length > 2) {
+            precision = 2;
+            about = "~";
+          }
+        }
+        return about + val.toFixed(precision) + " " + unit;
       }
     };
   }
