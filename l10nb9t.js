@@ -14,7 +14,8 @@
     return {
       pattern: new RegExp(/(?:^|\s+)(\d+[\d,.]*)\s*/.source + regexp.source + /\b/.source),
       result: function(match) {
-        return "~" + (match[1] * factor).toFixed(2) + " " + unit;
+        var val = match[1].replace(",", "")
+        return "~" + (val * factor).toFixed(2) + " " + unit;
       }
     };
   }
@@ -110,15 +111,15 @@ var _ = {
       }
     }),
 
-    UnitPattern(/(?:miles?|mi|ml)/i, 1.60935, "km"),
-    UnitPattern(/(?:sq|square)\s+(?:ft|feet)/i, 0.09290304, "m2"),
-    UnitPattern(/(?:'|foot|feet|ft)/i, 0.3048, "m"),
-    UnitPattern(/(?:\"|inch|inches|in)/i, 2.54, "cm"),
-    UnitPattern(/(?:yards?|yd)/i, 0.9144, "m"),
-    UnitPattern(/(?:pounds?|lb)/i, 0.454, "kg"),
-    UnitPattern(/(?:ounces?|oz)/i, 28.35, "g"),
-    UnitPattern(/(?:gallons?|gal)/i, 4.54609, "L"),
-    UnitPattern(/(?:pints?|pt)/i , 0.56826125 , "L")
+    UnitPattern(/(?:miles?|mi|mls?)/i, 1.60935, "km"),
+    UnitPattern(/(?:sq|square)\s+(?:feet|fts?)/i, 0.09290304, "m2"),
+    UnitPattern(/(?:'|foot|feet|fts?)/i, 0.3048, "m"),
+    UnitPattern(/(?:\"|inch|inches|ins?)/i, 2.54, "cm"),
+    UnitPattern(/(?:yard|yd)s?/i, 0.9144, "m"),
+    UnitPattern(/(?:pound|lb)s?/i, 0.454, "kg"),
+    UnitPattern(/(?:ounce|oz)s?/i, 28.35, "g"),
+    UnitPattern(/(?:gallon|gal)s?/i, 4.54609, "L"),
+    UnitPattern(/(?:pint|pt)s?/i , 0.56826125 , "L")
   ],
   search: function (node) {
     var text = node.data
