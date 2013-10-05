@@ -131,18 +131,25 @@ var _ = {
     UnitPattern(/(?:pint|pt)s?/i , 0.56826125 , "L")
   ],
   search: function (node) {
-    var text = node.data
+    var temp = node.data,
+        replaces = {}; // This is to prevent multiple convertion of same string
     each(this.patterns, function(p) {
-      var re = new RegExp(p.pattern.source, "ig"), m;
-      //for (i=0; (m = re.exec(text)) != null && i < 3; i++) {
+      var re = new RegExp(p.pattern.source, "ig"),
+          text = temp, m, k;
       while ((m = re.exec(text)) != null) {
         try {
-          node.data = node.data.replace(m[0], m[0] + " (" + p.result.call(p, m) + ")");
+          k = "{{" + m.index + "}}";
+          temp = temp.replace(m[0], k);
+          replaces[k] = m[0] + " (" + p.result.call(p, m) + ")";
         } catch (e) {
           console.log(e);
         }
       }
     });
+    for (var k in replaces) {
+      temp = temp.replace(k, replaces[k]);
+    }
+    node.data = temp;
   },
   traverseNode: function (node) {
     //console.debug(node);
