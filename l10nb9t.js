@@ -122,8 +122,8 @@ var _ = {
 
     UnitPattern(/(?:miles?|mi|mls?)/i, 1.60935, "km"),
     UnitPattern(/(?:sq|square)\s+(?:feet|fts?)/i, 0.09290304, "m2"),
-    UnitPattern(/(?:'|foot|feet|fts?)/i, 0.3048, "m"),
-    UnitPattern(/(?:\"|inch|inches|ins?)/i, 2.54, "cm"),
+    UnitPattern(/(?:'|’|foot|feet|fts?)/i, 0.3048, "m"),
+    UnitPattern(/(?:\"|”|inch|inches|ins?)/i, 2.54, "cm"),
     UnitPattern(/(?:yard|yd)s?/i, 0.9144, "m"),
     UnitPattern(/(?:pound|lb)s?/i, 0.454, "kg"),
     UnitPattern(/(?:ounce|oz)s?/i, 28.35, "g"),
