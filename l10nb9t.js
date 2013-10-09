@@ -34,7 +34,7 @@
     "PT": [[2, 0, 2], [10, 0, 1]],
   };
   var rr = {
-    "date": /(\w+\s+\d{1,2}\s*,?\s*\d{4}),?/,
+    "date": /(\w+\s+\d{1,2}\s*,?\s*\d{4}|\d{4}[-\/]\d{2}[-\/]\d{2}),?/,
     "time": /([\d:]+(?:\s*[AP]M)?)/,
     "tz": /([\w\/]+(?:[-+]\d)?)/
   };
@@ -72,6 +72,13 @@
     }
     return str;
   }
+  function normalizeDate(str) {
+    var m = str.match(/(\d{4})-(\d{2})-(\d{2})/);
+    if (m) {
+      return m[1] + "/" + m[2] + "/" + m[3];
+    }
+    return str;
+  }
   // DatePattern
   function DatePattern(arg) {
     var pattern, resultFunc, re, h = {};
@@ -81,7 +88,7 @@
     } else {
       pattern = arg;
       resultFunc = function(match) {
-        return dateString(new Date(match[h["date"]] + " " + normalizeTime(match[h["time"]]) + " " + normalizeTimeZone(match[h["tz"]])));
+        return dateString(new Date(normalizeDate(match[h["date"]]) + " " + normalizeTime(match[h["time"]]) + " " + normalizeTimeZone(match[h["tz"]])));
       };
     }
 
@@ -107,9 +114,9 @@
   
 var _ = {
   patterns: [
-    // e.g. "Sep 10, 2013 10:00 PDT"
+    // e.g. Sep 10, 2013 10:00 PDT
     DatePattern(["date", /\s+/, "time", /\s+/, "tz"]),
-    // e.g. "4 pm US/Pacific on Sep 11 2013"
+    // e.g. 4 pm US/Pacific on Sep 11 2013
     DatePattern(["time", /\s+/, "tz", /\s+(?:on)?\s+/, "date"]),
     DatePattern({
       pattern: ["date", /\s+/, "time", /\s+-\s+/, "time", /\s+/, "tz"],
